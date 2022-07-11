@@ -1,0 +1,204 @@
+---
+title: "Advanced Statistical Computing Homework 1"
+author: "Sadaf Rohani"
+date: "8/31/2020"
+output:
+  pdf_document:
+    latex_engine: xelatex
+    highlight: haddock
+    keep_tex: no
+    toc: yes
+    number_sections: yes
+geometry: margin = 0.5in
+fontsize: 12pt
+header-includes:
+- \usepackage{booktabs}
+- \usepackage{longtable}
+- \usepackage{array}
+- \usepackage{multirow}
+- \usepackage{wrapfig}
+- \usepackage{float}
+- \usepackage{colortbl}
+- \usepackage{pdflscape}
+- \usepackage{tabu}
+- \usepackage{threeparttable}
+- \usepackage{threeparttablex}
+- \usepackage[normalem]{ulem}
+- \usepackage{makecell}
+- \usepackage{xcolor}
+- \usepackage{tcolorbox}
+- \usepackage{placeins}
+editor_options:
+  chunk_output_type: console
+documentclass: report
+urlcolor: blue
+---
+
+```{r setup, include=FALSE}
+# This is the setup chunk
+library(knitr) 
+knitr::opts_chunk$set(echo = FALSE, 
+                      comment = NA, 
+                      fig.path = "./figures/",  # Store all figures here in relative path
+                      fig.align = "center",
+                      fig.width = 7,
+                      fig.height = 7,
+                      message = FALSE, # Turn off load messages
+                      warning = FALSE, # Turn off warnings
+                      fig.pos ="H"
+                      )
+
+```
+
+```{r include=FALSE}
+# Setting working directory
+
+setwd("/Users/Sadaf/Desktop/ASC II/Module 1/HW/")
+```
+
+# Introduction
+
+## Background
+
+Hi! My name is Sadaf Rohani, and I'm a 24 year old DAAS student currently living in Gainesville, VA. My family is originally from Afghanistan, but I've lived in America since I was 2 years old. 
+
+```{r, echo=FALSE, fig.align="center", out.width="50%", fig.cap="Pictured with Traditional Jewelry"}
+knitr::include_graphics("pic2.jpg")
+```
+
+\newpage
+
+## Education
+
+I graduated a couple years ago with my BS in Neuroscience from George Mason University, took a gap year, then started my Master's program at VT last year. 
+
+## Employment
+
+Currently, I work as a student co-op at the United States Postal Service Office of Inspector General's office (USPS OIG). A current work-in-progress for me is a project that will improve major mailer loss reporting. 
+
+## Hobbies & More
+
+In my free time, I love to read books such as Pride & Prejudice. I also have several reality TV shows that I am guiltily addicted to reality shows like Love Island UK, 90 Day Fiance, and Selling Sunset. 
+
+One of my favorite foods has to be pizza, and nothing beats an authentic NY slice. Thankfully, I've been able to visit NYC fairly regularly (before Covid) as I used to live in Queens and like to see my cousins there. I've also slowly started to travel more; the most recent place I went to was Costa Rica and it was lovely.
+
+```{r, echo=FALSE, fig.align="center", out.width="50%", fig.cap="Costa Rica, March 2020"}
+knitr::include_graphics("cr.jpg")
+```
+
+# NEH Data
+
+## Overview 
+
+The National Endowment for the Humanities (NEH) is a federal organization that supports projects focused on the humanities. I wanted to look at the various characteristics of applicants that received grants. Below is a quick look at some of the grant information available from fiscal years 2010-2019:
+
+```{r}
+#import data & specify variable type
+install.packages("scales",repos = "http://cran.us.r-project.org")
+library(tidyverse)
+library(xtable)
+library(kableExtra)
+library(pander)
+library(stargazer)
+library(formattable)
+library(formatR)
+library(ggthemes)
+library(esquisse)
+neh <- read_csv("NEH_Grants2010s.csv",
+                col_types = list(
+                  OrganizationType = col_factor(),
+                  Institution = col_factor(),
+                  InstCountry = col_factor(),
+                  InstCity = col_factor(),
+                  InstState = col_factor(),
+                  InstPostalCode = col_factor(),
+                  Program = col_factor(),
+                  Division = col_factor(),
+                  PrimaryDiscipline = col_factor(),
+                  Disciplines = col_factor(),
+                  Latitude = col_number(),
+                  Longitude = col_number(),
+                  ApplicantType = col_factor()
+                )
+                )
+levels(neh$ApplicantType) <- c("Individual","Organization")
+```
+
+```{r tidy=TRUE, fig.height=3, fig.width=3}
+kable(cbind(neh[1:5,c(3,19,20,22)]), align="c",caption = "A Portion of NEH Grant Data from Fiscal Years 2010-2019") %>% kable_styling(latex_options = c("striped", "scale_down","hold_position"))
+```
+
+
+This data set was obtained from [Data.gov](https://catalog.data.gov/dataset/neh-grant-data-2010-2019-csv-3f3dd) and can be accessed via my [Google Drive](https://drive.google.com/drive/folders/18Q6DMCWIa-EmgrSKBJkniawjiDtWKWss?usp=sharing). 
+
+There are 33 total columns, with variables to identify the grant application number, grant type and discipline, institution information and location data, amount and date awarded if application was approved, and supporting program information such as the title and description. 
+
+For a more detailed data dictionary, visit the [NEH website](https://securegrants.neh.gov/open/data/NEH_GrantsDictionary.pdf).
+
+## A Closer Look
+
+Let's look at some summary statistics for the dataset: 
+
+```{r tidy=TRUE}
+selected_stats <- neh %>% select(Institution, OrganizationType, Program, Division, AwardOutright, SupplementAmount, ProjectTitle)
+
+kable(summary(selected_stats), format="latex", booktabs=TRUE,align="l", caption = "NEH 2010-2019 Grant Selected Summary Statistics") %>% kable_styling(font_size=10, full_width=TRUE, row_label_position="l",latex_options = c("striped", "scale_down","hold_position")) %>% column_spec(6,width="3cm")
+```
+
+It appears that 4-year colleges are the organizations that apply for the most NEH grants. The overwhelming majority of applications (7430/7502) were from the United States. The University of Virginia (UVA) was the institution that submitted the most grant applications, but most applications were submitted from organizations in New York. 
+
+Preservation Assistance Grants were the most applied to program, while most applications were for research divisions. 
+
+The average monetary worth of the grants awarded was $144801$ USD, with an average supplemental award of $35936$ USD.
+
+We can narrow the dataset to show those applications that were rewarded more than the average amount for either outright grants or supplemental money. 
+
+
+```{r tidy=TRUE}
+grouped_data <- neh %>% select(Institution,Program,Division,AwardOutright,AwardMatching,SupplementAmount,ProjectTitle) %>% filter(AwardOutright > mean(AwardOutright) & SupplementAmount > mean(SupplementAmount))
+
+grouped_data %>% top_n(n=10,wt=AwardOutright) %>% kable(align="c", caption = "Above Average NEH Grant Summary Statistics") %>% kable_styling(font_size=10,full_width=TRUE,row_label_position="l",latex_options = c("striped", "scale_down","HOLD_position")) %>% column_spec(6,width="5cm")
+```
+
+Of the 10 highest-awarded grant applicants, 9 were in a federal/state partnership division. The lone applicant in the public programs division was part of the Mid-America Arts Alliance whose project aim was to propose a way to "sustain the NEH on the road traveling exhibition program."
+
+## Visuals
+
+As one can see, there is a fairly strong, positive linear relationship between the the approved grant value and the actual grant value that was awarded throughout the years. 
+
+```{r}
+outright <- ggplot(neh, aes(x=ApprovedOutright, y=AwardOutright, color=as.factor(YearAwarded))) 
+outright+theme_clean() + geom_line() + facet_wrap(~YearAwarded) + labs(x = "Amount of Grant Money Approved $", y="Amount of Grant Money Awarded $", title = "Value of Grants Approved vs Grants Awarded Per Fiscal Year") + theme(axis.text.x = element_blank(),legend.position = "none") + scale_y_continuous(labels = scales::dollar)
+```
+
+However, that linear relationship is not at several different time points when it comes to comparing the amount of matching grant money approved versus the actual amount of matching values awarded. 
+
+```{r}
+matching <- ggplot(neh, aes(x=ApprovedMatching, y=AwardMatching, color=as.factor(YearAwarded))) 
+matching+theme_clean() + geom_line() + facet_wrap(~YearAwarded) + labs(x = "Amount of Matching Grant Money Approved $", y="Amount of Matching Grant Money Awarded $", title = "Value of Matching Grants Approved vs Matching Grants Awarded Outright Per Fiscal Year") + theme(axis.text.x = element_blank(), legend.position = "none") + scale_y_continuous(labels = scales::dollar)
+```
+
+From the tables in the previous sections, we know that the United States is the country with the most grants awarded. We can drill down further and look at the US in more detail. 
+
+```{r fig.width=11, fig.height=7}
+us_data <- neh %>% filter(InstCountry == "USA")
+us_plot <- ggplot(us_data, aes(x=InstState,y=AwardOutright, color = InstState))
+us_plot + geom_point() +  theme_economist_white() + theme(legend.position = "none", axis.text.x = element_blank()) + labs(x = "US States", y="Amount of Grant Money Awarded Outright $", title = "Value of Grants Awarded Outright Per US State") + scale_y_continuous(labels = scales::dollar) + geom_text(aes(label=ifelse(us_data$AwardOutright > mean(us_data$AwardOutright), as.character(us_data$InstState),''), hjust = -0.25,vjust=0.75), check_overlap = TRUE) + geom_hline(aes(yintercept=mean(us_data$AwardOutright), color = 'black')) 
+```
+
+Above, we can see that there were several states that received grants valued at more than the average NEH grant received by other states. Some appear to be outliers, such as California receiving 3 grants worth over 6 million dollars, or Texas with 3 grants worth over 4 million dollars and New York State with 2 grants over 2 million. 
+
+These 3 states can be  into these 3 states and to see if there are any similarities in the grants received.
+
+```{r}
+us3 <- us_data %>% filter(InstState == "NY" | InstState == "TX" | InstState == "CA")
+state_plot <- ggplot(data=us3) 
+state_plot + theme_economist_white() + geom_boxplot(aes(x=InstState, y = AwardOutright,color=InstState), alpha=0.7) + facet_wrap(~Division) +
+geom_point(aes(x = InstState, y = AwardOutright), size=1) + theme(legend.position = "none", strip.text = element_text(size=7)) + labs(x = "State", y="Amount of Grant Money Awarded Outright $", title = "Value of Grants Awarded Per Division") + scale_y_continuous(labels = scales::dollar) 
+```
+
+There is a difference in the monetary value of grants awarded based on division. For California, NY, and Texas, the Federal/State Partnership division results in a wider range of grant money awarded than the other divisions. 
+
+# Conclusion
+
+From fiscal years 2010 through 2019, 7,502 grants were awarded by the National Endowment for the Humanities. The vast majority of those grants were awarded to US-based applicants. Four-year colleges made up the majority of US grant applicants. The mean value of grants that were outright awarded was $144801$ USED, however there were some applicants in a few states that received grants worth millions. 
