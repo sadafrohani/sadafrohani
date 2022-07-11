@@ -1,0 +1,108 @@
+---
+title: "Meaningful Report Title"
+author: "your name"
+date: "date"
+output:
+    pdf_document:
+      highlight: haddock
+      keep_tex: no
+      number_sections: no
+    html_document:
+      df_print: paged
+geometry: margin = 0.5in
+header-includes:
+- \usepackage{booktabs}
+- \usepackage{longtable}
+- \usepackage{array}
+- \usepackage{multirow}
+- \usepackage{wrapfig}
+- \usepackage{float}
+- \usepackage{colortbl}
+- \usepackage{pdflscape}
+- \usepackage{tabu}
+- \usepackage{threeparttable}
+- \usepackage{threeparttablex}
+- \usepackage[normalem]{ulem}
+- \usepackage{makecell}
+- \usepackage{xcolor}
+editor_options:
+  chunk_output_type: console
+documentclass: article
+urlcolor: blue
+---
+
+```{r setup, include=FALSE}
+# This is the setup chunk
+#  Here you can set global options for the entire document
+
+library(knitr) # I recommend doing this
+
+# Although you can call functions from a library using the following notation
+#  without loading the entire library.
+knitr::opts_chunk$set(echo = TRUE, 
+                      comment = NA, # Recommended
+                      fig.path = "./figures/",  # Store all figures here in relative path
+                      fig.align = "center",
+                      fig.width = 7,
+                      fig.height = 7,
+                      message = FALSE, # Turn off load messages
+                      warning = FALSE # Turn off warnings
+                      )
+
+```
+
+
+# Instructions:
+
+**Delete the Instructions portion from your final write-up.  The report you submit should look like a professional report you would submit for work.  The objective of the midterm is to develop a professional report using the tools and techniques you have learned in the first half of the class. A grading rubric is provided, please reference it closely for guidance on writing your report.**
+
+Consider the CO2 Emission data available on Kaggle:  https://www.kaggle.com/datasets?search=CO2
+
+Your boss has asked you for a report explaining the current state of knowledge on CO2 emissions.  Develop a report that uses at least three datasets from Kaggle or any other source of information on CO2 emissions.
+
+**Your report should:**
+
+1. Include 5 sections - section headers are provided below. Include subsections as needed.
+
+2. Address any data cleaning challenges - be sure to discuss the challenges in the text and include the corresponding code in the RMD file.
+
+3. Ask 3 research questions that include 2 or more variables each.
+
+4. Develop plots and univariate descriptive statistics to shape the researh questions.
+
+5. Conduct appropriate statistical analysis based on limited exploritory techniques we have used in class so far.
+
+6. Include at least 3 different equations for exploratory analysis (these could be mean, median, frequencies, proportions, etc., they do not need to be complex - write the equations in the text)
+
+7. Develop at least 3 bi-variate/multivariate plots to explore relationships.
+
+8. Write a concluding section that suggests next steps for understanding the problem.
+
+
+
+**Required:**
+
+* The final product that you turn in must be a .pdf file with a coresponding .rmd file.
+
+* All plots, tables, and other types of figures should look as professional as possible.  You should have appropriate titles, x- and y- labels, and legends (if necessary).  All plot elements should be clear and easy to read.  Go beyond the bare minimum and read further on how to customize your plots and tables.
+
+* The report should be around 3000 words (10-12 pages in length depending on figures and tables).
+
+
+
+#Overview
+
+#Data Selections and Clearning
+
+#Research Questions & Exploratory Data Analysis
+
+#Statistical Analysis
+
+#Conclusions and Future Work
+
+
+
+
+
+
+
